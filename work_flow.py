@@ -25,7 +25,7 @@ def process():
     tc = GetTickCount()
     logging.info("************************ process start ***************************************")
     try:
-        #raise urllib.error.URLError('')
+        raise urllib.error.URLError('')
         #拉取股票数据，把代码，名称，流通市值存到csv文件
         tc = GetTickCount()
         Beep(1000, 500);
@@ -42,7 +42,7 @@ def process():
         subset['code'] = subset['code'].astype(str)
         stocks = [tuple(x) for x in subset.values]
 
-    if utils.need_update_data():
+    if utils.need_update_data() and 0:
         utils.prepare()
         data_fetcher.run(stocks[:1000])
         check_exit()
