@@ -1,4 +1,6 @@
 # -*- encoding: UTF-8 -*-
+import sys
+sys._enablelegacywindowsfsencoding() #应对windowss下文件名乱码，pandas的一个bug
 
 import utils
 import logging

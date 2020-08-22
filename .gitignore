@@ -1,8 +1,10 @@
-/data/*.h5
-/storage/*.db
-/storage/*.csv
+/data
+/data_
+/storage/
 /.idea/
 /__pycache__/
 /sequoia.log
+/strategy - 文本/
 *.pyc
+*baiduyun*
 .DS_Store

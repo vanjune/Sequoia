@@ -45,9 +45,10 @@ def clean_files():
 def read_data(code_name):
     stock = code_name[0]
     name = code_name[1]
-    file_name = stock + '-' + name + '.h5'
-    if os.path.exists(settings.DATA_DIR + "/" + file_name):
-        return pd.read_hdf(settings.DATA_DIR + "/" + file_name)
+    file_name = stock + '-' + name.replace('*', '#') + '.h5'
+    fn = os.path.join(settings.DATA_DIR, file_name);
+    if os.path.exists(fn):
+        return pd.read_hdf(fn)
     else:
         return
 

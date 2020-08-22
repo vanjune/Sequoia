@@ -18,26 +18,36 @@ import datetime
 import urllib
 import settings
 import pandas as pd
+from win32api import GetTickCount, Beep
 
 
 def process():
+    tc = GetTickCount()
     logging.info("************************ process start ***************************************")
     try:
+        #raise urllib.error.URLError('')
+        #拉取股票数据，把代码，名称，流通市值存到csv文件
+        tc = GetTickCount()
+        Beep(1000, 500);
         all_data = ts.get_today_all()
+        print("读取股票代码耗时%d毫秒"%(GetTickCount()-tc));tc = GetTickCount();
+        Beep(1000, 500);
         subset = all_data[['code', 'name', 'nmc']]
         subset.to_csv(settings.STOCKS_FILE, index=None, header=True)
         stocks = [tuple(x) for x in subset.values]
+        # 统计一下龙虎榜
         statistics(all_data, stocks)
     except urllib.error.URLError as e:
         subset = pd.read_csv(settings.STOCKS_FILE)
         subset['code'] = subset['code'].astype(str)
         stocks = [tuple(x) for x in subset.values]
 
-    # if utils.need_update_data():
-    #     utils.prepare()
-    #     data_fetcher.run(stocks)
-    #     check_exit()
-
+    if utils.need_update_data():
+        utils.prepare()
+        data_fetcher.run(stocks[:1000])
+        check_exit()
+        print("读取K线耗时%d毫秒"%(GetTickCount()-tc));tc = GetTickCount();
+        input('按键，继续');
     strategies = {
         '海龟交易法则': turtle_trade.check_enter,
         '放量上涨': enter.check_volume,
@@ -52,13 +62,16 @@ def process():
         strategies['均线多头'] = keep_increasing.check
 
     for strategy, strategy_func in strategies.items():
+        tc = GetTickCount();
         check(stocks, strategy, strategy_func)
+        print("耗时%d毫秒"%(GetTickCount()-tc));
         time.sleep(2)
 
     logging.info("************************ process   end ***************************************")
 
 
 def check(stocks, strategy, strategy_func):
+    # 跑策略，跑完过滤出来合格的股票并显示
     end = None
     m_filter = check_enter(end_date=end, strategy_fun=strategy_func)
     results = list(filter(m_filter, stocks))
@@ -68,6 +81,7 @@ def check(stocks, strategy, strategy_func):
 
 
 def check_enter(end_date=None, strategy_fun=enter.check_volume):
+    # 返回一个函数，如果跑过这个策略了就读了直接给，否则跑策略
     def end_date_filter(code_name):
         data = utils.read_data(code_name)
         if data is None:

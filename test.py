@@ -1,4 +1,6 @@
 # -*- encoding: UTF-8 -*-
+import sys
+sys._enablelegacywindowsfsencoding() #应对windowss下文件名乱码，pandas的一个bug
 
 import utils
 from talib import ATR
@@ -10,6 +12,7 @@ import strategy.parking_apron as parking_apron
 import strategy.breakthrough_platform as breakthrough_platform
 import logging
 import settings
+import data_fetcher
 
 # data = utils.load("000012.h5")
 #
@@ -29,13 +32,19 @@ settings.init()
 # code_name = ('300623', '捷捷微电')
 # code_name = ('600145', '*ST新亿')
 # code_name = ('601700', '风范股份')
-# code_name = ('000725', '京东方Ａ')
-code_name = ('002157', '正邦科技')
+##code_name = ('000725', '京东方Ａ')
+# code_name = ('002157', '正邦科技')
 # code_name = ('300663', '科蓝软件')
+# code_name = ('688588', u'凌志软件')
+code_name = ('000001', u'平安银行')
 # end = '2017-09-26'
 end = '2019-02-15'
 
 data = utils.read_data(code_name)
+nu = utils.need_update_data()
+if(nu):
+    data_fetcher.update_data(code_name)
+
 # print(data)
 result = enter.check_volume(code_name, data, end_date=end)
 print("low atr check {0}'s result: {1}".format(code_name, result))
